@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PDV.Domain.Entities;
+namespace PDV.Domain.Entities.Produtos;
 
 public class Produto
 {

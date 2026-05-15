@@ -1,9 +1,9 @@
 ﻿using Microsoft.Data.Sqlite;
 using PDV.Application.Interfaces;
-using PDV.Domain.Entities;
+using PDV.Domain.Entities.Produtos;
 using PDV.Infrastructure.Database;
 
-namespace PDV.Infrastructure.Repositories;
+namespace PDV.Infrastructure.Repositories.Produtos;
 
 public class ProdutoVariacaoRepository : IProdutoVariacaoRepository
 {

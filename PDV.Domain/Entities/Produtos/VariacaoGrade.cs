@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PDV.Domain.Entities;
+namespace PDV.Domain.Entities.Produtos;
 
 public class VariacaoGrade
 {
