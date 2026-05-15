@@ -6,7 +6,7 @@ namespace PDV.WinForms
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            global::System.Windows.Forms.Application.Run(new FrmFrenteCaixa());
+            global::System.Windows.Forms.Application.Run(new FrmFrenteCaixaPDV());
         }
     }
 }

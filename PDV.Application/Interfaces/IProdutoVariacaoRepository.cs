@@ -1,4 +1,4 @@
-﻿using PDV.Domain.Entities;
+﻿using PDV.Domain.Entities.Produtos;
 
 namespace PDV.Application.Interfaces;
 
