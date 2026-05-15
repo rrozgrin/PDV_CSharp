@@ -1,0 +1,8 @@
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+pdv.db
+*.db-wal
+*.db-shm
