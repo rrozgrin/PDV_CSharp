@@ -20,10 +20,11 @@ public class ProdutoVariacaoRepository : IProdutoVariacaoRepository
         connection.Open();
 
         const string sql = @"
-            SELECT id, produto_id, codigo_barras, preco_venda, estoque_atual
-            FROM produto_variacao
+            SELECT pv.id, produto_id, codigo_barras, preco_venda, estoque_atual, p.descricao as descricao
+            FROM produto_variacao pv
+            INNER JOIN produto p ON p.id = pv.produto_id
             WHERE codigo_barras = $codigoBarras
-              AND ativo = 1
+              AND pv.ativo = 1
             LIMIT 1;";
 
         using var cmd = new SqliteCommand(sql, connection);
@@ -37,7 +38,8 @@ public class ProdutoVariacaoRepository : IProdutoVariacaoRepository
         var cb = reader.GetString(2);
         var preco = reader.GetDecimal(3);
         var estoque = reader.GetDecimal(4);
+        var descricao = reader.GetString(5);
 
-        return new ProdutoVariacao(produtoId, cb, preco, estoque);
+        return new ProdutoVariacao(produtoId, cb, preco, estoque, descricao);
     }
 }

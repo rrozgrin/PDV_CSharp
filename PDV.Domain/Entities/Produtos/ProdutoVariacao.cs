@@ -12,6 +12,7 @@ public class ProdutoVariacao
     public string CodigoBarras { get; private set; }
     public decimal PrecoVenda { get; private set; }
     public decimal EstoqueAtual { get; private set; }
+    public string Descricao { get; private set; }
 
     public bool Ativo { get; private set; } = true;
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
@@ -21,7 +22,8 @@ public class ProdutoVariacao
         Guid produtoId,
         string codigoBarras,
         decimal precoVenda,
-        decimal estoqueAtual = 0)
+        decimal estoqueAtual = 0,
+        string descricao = "")
     {
         if (produtoId == Guid.Empty)
             throw new ArgumentException("ProdutoId invalido.");
@@ -39,6 +41,13 @@ public class ProdutoVariacao
         CodigoBarras = codigoBarras.Trim();
         PrecoVenda = precoVenda;
         EstoqueAtual = estoqueAtual;
+        Descricao = descricao?.Trim() ?? string.Empty;
+    }
+
+    // Compatibilidade binária: overload esperado por assemblies antigas
+    public ProdutoVariacao(Guid produtoId, string codigoBarras, decimal precoVenda, decimal estoqueAtual)
+        : this(produtoId, codigoBarras, precoVenda, estoqueAtual, "")
+    {
     }
 
     public void AlterarPreco(decimal novoPreco)
