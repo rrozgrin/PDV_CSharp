@@ -1,0 +1,1 @@
+Requesting file contents: PDV.Domain\Entities\Produtos\ProdutoVariacao.cs

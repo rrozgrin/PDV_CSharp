@@ -16,12 +16,22 @@ namespace PDV.WinForms
     {
         private readonly ProdutoVariacaoRepository _produtoVariacaoRepository;
         private decimal _totalVenda = 0m;
+        private decimal _quantidadePendente = 1m;
 
         public FrmFrenteCaixaPDV()
         {
             InitializeComponent();
 
-            var connectionFactory = new SqliteConnectionFactory(@"Data Source=C:\Users\dev_php\source\repos\PDV_CSharp\pdv.db");
+            // 1. Descobre a pasta onde o programa está sendo executado (geralmente a bin/Debug)
+            string diretorioBase = AppDomain.CurrentDomain.BaseDirectory;
+
+            // 2. Junta o caminho da pasta com o nome do arquivo do banco de dados
+            string caminhoBanco = System.IO.Path.Combine(diretorioBase, "pdv.db");
+
+            // 3. Monta a string de conexão corretamente
+            string stringConexao = $"Data Source={caminhoBanco}";
+
+            var connectionFactory = new SqliteConnectionFactory(stringConexao);
             _produtoVariacaoRepository = new ProdutoVariacaoRepository(connectionFactory);
         }
 
@@ -50,10 +60,9 @@ namespace PDV.WinForms
 
         }
 
-        private void ConsultarCodigoBarras()
+        private void ConsultarCodigoBarras(decimal quantidade)
         {
             var codigoBarras = txtCodigoBarras.Text.Trim();
-            var quantidade = 1; // Para simplificar, sempre consideramos quantidade 1. Você pode expandir isso para permitir que o usuário informe a quantidade.
             var nomeProduto = string.Empty;
 
             if (string.IsNullOrWhiteSpace(codigoBarras))
@@ -64,7 +73,6 @@ namespace PDV.WinForms
             }
 
             var variacao = _produtoVariacaoRepository.BuscarPorCodigoBarras(codigoBarras);
-
             if (variacao is null)
             {
                 MessageBox.Show("Produto nao encontrado.");
@@ -74,18 +82,20 @@ namespace PDV.WinForms
             }
 
             txtPrecoUnitario.Text = variacao.PrecoVenda.ToString("N2");
-            txtQuantidade.Text = "1";
+            txtQuantidade.Text = quantidade.ToString("N3");
 
-            var totalItem = variacao.PrecoVenda;
+            var totalItem = variacao.PrecoVenda * quantidade;
             _totalVenda += totalItem;
             lblTotalGeral.Text = $"Total: R$ {_totalVenda:N2}";
             txtTotalItem.Text = totalItem.ToString("N2");
             nomeProduto = variacao.Descricao;
 
+            var numeroItem = dgvItens.Rows.Count + 1;
             dgvItens.Rows.Add(
+                numeroItem,
                 variacao.CodigoBarras,
                 nomeProduto,
-                quantidade,
+                quantidade.ToString("N3"),
                 variacao.PrecoVenda.ToString("N2"),
                 totalItem.ToString("N2"));
 
@@ -96,14 +106,32 @@ namespace PDV.WinForms
 
         private void btnAdicionar_Click(object sender, EventArgs e)
         {
-            ConsultarCodigoBarras();
+            ConsultarCodigoBarras(_quantidadePendente);
+            _quantidadePendente = 1m;
+            txtQuantidade.Text = "1";
         }
 
         private void txtCodigoBarras_KeyDown(object sender, KeyEventArgs e)
         {
+            var texto = txtCodigoBarras.Text.Trim();
+
+            // Ex.: "2x" ou "2*"
+            if ((texto.EndsWith("x", StringComparison.OrdinalIgnoreCase) || texto.EndsWith("*")) &&
+                decimal.TryParse(texto[..^1], out var qtd) && qtd > 0)
+            {
+                _quantidadePendente = qtd;
+                txtQuantidade.Text = _quantidadePendente.ToString("N3");
+                txtCodigoBarras.Clear();
+                e.SuppressKeyPress = true;
+                return;
+            }
+
             if (e.KeyCode == Keys.Enter)
             {
-                ConsultarCodigoBarras();
+                ConsultarCodigoBarras(_quantidadePendente);
+                _quantidadePendente = 1m;
+                txtQuantidade.Text = "1";
+                e.SuppressKeyPress = true;
             }
         }
 
