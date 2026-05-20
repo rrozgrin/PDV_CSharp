@@ -28,11 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
             pnlMenu = new Panel();
             lblStatusCaixa = new Label();
             btnNovaVenda = new Button();
             lblTotalGeral = new Label();
             dgvItens = new DataGridView();
+            colItem = new DataGridViewTextBoxColumn();
             colCodigo = new DataGridViewTextBoxColumn();
             colDescricao = new DataGridViewTextBoxColumn();
             colQtd = new DataGridViewTextBoxColumn();
@@ -58,7 +66,7 @@
             pnlMenu.Location = new Point(-3, 2);
             pnlMenu.Margin = new Padding(3, 4, 3, 4);
             pnlMenu.Name = "pnlMenu";
-            pnlMenu.Size = new Size(936, 38);
+            pnlMenu.Size = new Size(1151, 38);
             pnlMenu.TabIndex = 14;
             // 
             // lblStatusCaixa
@@ -85,7 +93,7 @@
             lblTotalGeral.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             lblTotalGeral.Font = new Font("Bahnschrift Condensed", 36F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblTotalGeral.ForeColor = Color.CornflowerBlue;
-            lblTotalGeral.Location = new Point(679, 399);
+            lblTotalGeral.Location = new Point(796, 447);
             lblTotalGeral.Name = "lblTotalGeral";
             lblTotalGeral.Size = new Size(236, 58);
             lblTotalGeral.TabIndex = 25;
@@ -101,44 +109,87 @@
             dgvItens.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvItens.BackgroundColor = SystemColors.ControlLightLight;
             dgvItens.BorderStyle = BorderStyle.Fixed3D;
+            dgvItens.CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvItens.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvItens.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvItens.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colDescricao, colQtd, colUnit, colTotal });
+            dgvItens.Columns.AddRange(new DataGridViewColumn[] { colItem, colCodigo, colDescricao, colQtd, colUnit, colTotal });
             dgvItens.Location = new Point(279, 48);
             dgvItens.Name = "dgvItens";
             dgvItens.ReadOnly = true;
             dgvItens.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvItens.Size = new Size(636, 333);
+            dgvItens.Size = new Size(753, 381);
             dgvItens.TabIndex = 24;
+            // 
+            // colItem
+            // 
+            colItem.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colItem.DefaultCellStyle = dataGridViewCellStyle2;
+            colItem.HeaderText = "#";
+            colItem.Name = "colItem";
+            colItem.ReadOnly = true;
+            colItem.Width = 30;
             // 
             // colCodigo
             // 
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colCodigo.DefaultCellStyle = dataGridViewCellStyle3;
+            colCodigo.FillWeight = 299.401184F;
             colCodigo.HeaderText = "Código";
             colCodigo.Name = "colCodigo";
             colCodigo.ReadOnly = true;
             // 
             // colDescricao
             // 
-            colDescricao.HeaderText = "Item";
+            colDescricao.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            colDescricao.DefaultCellStyle = dataGridViewCellStyle4;
+            colDescricao.FillWeight = 50.149704F;
+            colDescricao.HeaderText = "Nome Produto";
             colDescricao.Name = "colDescricao";
             colDescricao.ReadOnly = true;
+            colDescricao.Width = 300;
             // 
             // colQtd
             // 
+            colQtd.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colQtd.DefaultCellStyle = dataGridViewCellStyle5;
+            colQtd.FillWeight = 50.149704F;
             colQtd.HeaderText = "Qtd";
             colQtd.Name = "colQtd";
             colQtd.ReadOnly = true;
+            colQtd.Width = 80;
             // 
             // colUnit
             // 
+            colUnit.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleRight;
+            colUnit.DefaultCellStyle = dataGridViewCellStyle6;
+            colUnit.FillWeight = 50.149704F;
             colUnit.HeaderText = "R$ Unit.";
             colUnit.Name = "colUnit";
             colUnit.ReadOnly = true;
+            colUnit.Width = 90;
             // 
             // colTotal
             // 
+            colTotal.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleRight;
+            colTotal.DefaultCellStyle = dataGridViewCellStyle7;
+            colTotal.FillWeight = 50.149704F;
             colTotal.HeaderText = "Total";
             colTotal.Name = "colTotal";
             colTotal.ReadOnly = true;
+            colTotal.Width = 110;
             // 
             // lblTotalItem
             // 
@@ -233,7 +284,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Info;
-            ClientSize = new Size(929, 476);
+            ClientSize = new Size(1046, 524);
             Controls.Add(pnlMenu);
             Controls.Add(btnNovaVenda);
             Controls.Add(lblTotalGeral);
@@ -274,6 +325,7 @@
         private Button btnAdicionar;
         private TextBox txtCodigoBarras;
         private Label lblCodicoBarras;
+        private DataGridViewTextBoxColumn colItem;
         private DataGridViewTextBoxColumn colCodigo;
         private DataGridViewTextBoxColumn colDescricao;
         private DataGridViewTextBoxColumn colQtd;

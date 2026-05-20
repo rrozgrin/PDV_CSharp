@@ -22,13 +22,9 @@ namespace PDV.WinForms
         {
             InitializeComponent();
 
-            // 1. Descobre a pasta onde o programa está sendo executado (geralmente a bin/Debug)
+            txtCodigoBarras.TextChanged += txtCodigoBarras_TextChanged;
             string diretorioBase = AppDomain.CurrentDomain.BaseDirectory;
-
-            // 2. Junta o caminho da pasta com o nome do arquivo do banco de dados
             string caminhoBanco = System.IO.Path.Combine(diretorioBase, "pdv.db");
-
-            // 3. Monta a string de conexão corretamente
             string stringConexao = $"Data Source={caminhoBanco}";
 
             var connectionFactory = new SqliteConnectionFactory(stringConexao);
@@ -41,7 +37,12 @@ namespace PDV.WinForms
             lblTotalGeral.AutoSize = false;
             lblTotalGeral.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             lblTotalGeral.TextAlign = ContentAlignment.MiddleRight;
-            lblTotalGeral.Width = 300; // ajuste conforme necessário
+            lblTotalGeral.Width = 500;
+
+            dgvItens.Columns["colUnit"]!.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvItens.Columns["colTotal"]!.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvItens.Columns["colDescricao"]!.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dgvItens.Columns["colCodigo"]!.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
 
             // Fixar posição X relativa ao form para evitar deslocamento quando outros controles mudam
             lblTotalGeral.Left = this.ClientSize.Width - lblTotalGeral.Width - 20; // 20px de margem
@@ -96,8 +97,11 @@ namespace PDV.WinForms
                 variacao.CodigoBarras,
                 nomeProduto,
                 quantidade.ToString("N3"),
-                variacao.PrecoVenda.ToString("N2"),
-                totalItem.ToString("N2"));
+                variacao.PrecoVenda.ToString("C"),
+                totalItem.ToString("C"));
+
+            _quantidadePendente = 1m;
+            txtQuantidade.Text = "1";
 
             txtCodigoBarras.Clear();
             txtCodigoBarras.Focus();
@@ -107,31 +111,48 @@ namespace PDV.WinForms
         private void btnAdicionar_Click(object sender, EventArgs e)
         {
             ConsultarCodigoBarras(_quantidadePendente);
-            _quantidadePendente = 1m;
-            txtQuantidade.Text = "1";
+        }
+
+        private void txtCodigoBarras_TextChanged(object? sender, EventArgs e)
+        {
+            var texto = txtCodigoBarras.Text.Trim();
+
+            if (texto.EndsWith("x", StringComparison.OrdinalIgnoreCase) || texto.EndsWith("*"))
+            {
+                string apenasONumero = texto[..^1];
+
+                if (decimal.TryParse(apenasONumero, out var qtd) && qtd > 0)
+                {
+                    _quantidadePendente = qtd;
+                    txtQuantidade.Text = _quantidadePendente.ToString("N3");
+                    txtPrecoUnitario.Clear();
+                    txtTotalItem.Clear();
+                    txtCodigoBarras.Clear();
+                }
+            }
         }
 
         private void txtCodigoBarras_KeyDown(object sender, KeyEventArgs e)
         {
-            var texto = txtCodigoBarras.Text.Trim();
-
-            // Ex.: "2x" ou "2*"
-            if ((texto.EndsWith("x", StringComparison.OrdinalIgnoreCase) || texto.EndsWith("*")) &&
-                decimal.TryParse(texto[..^1], out var qtd) && qtd > 0)
-            {
-                _quantidadePendente = qtd;
-                txtQuantidade.Text = _quantidadePendente.ToString("N3");
-                txtCodigoBarras.Clear();
-                e.SuppressKeyPress = true;
-                return;
-            }
-
             if (e.KeyCode == Keys.Enter)
             {
-                ConsultarCodigoBarras(_quantidadePendente);
-                _quantidadePendente = 1m;
-                txtQuantidade.Text = "1";
+                var texto = txtCodigoBarras.Text.Trim();
+                if (string.IsNullOrWhiteSpace(texto)) return;
+
                 e.SuppressKeyPress = true;
+
+                if (long.TryParse(texto, out _))
+                {
+                    ConsultarCodigoBarras(_quantidadePendente);
+
+                    //_quantidadePendente = 1m;
+                    //txtQuantidade.Text = "1";
+                }
+                else
+                {
+                    // Se tiver letras, abre a tela de pesquisar produto pelo nome
+                    // AbrirModalConsulta(texto); 
+                }
             }
         }
 
