@@ -6,17 +6,17 @@ namespace PDV.Domain.Entities.Produtos;
 
 public class ProdutoVariacao
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    // Propriedades (O estado do objeto)
+    public Guid Id { get; private set; }
     public Guid ProdutoId { get; private set; }
-
     public string CodigoBarras { get; private set; }
     public decimal PrecoVenda { get; private set; }
     public decimal EstoqueAtual { get; private set; }
     public string Descricao { get; private set; }
-
     public bool Ativo { get; private set; } = true;
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; private set; } = DateTimeOffset.UtcNow;
+
 
     public ProdutoVariacao(
         Guid produtoId,
@@ -25,18 +25,13 @@ public class ProdutoVariacao
         decimal estoqueAtual = 0,
         string descricao = "")
     {
-        if (produtoId == Guid.Empty)
-            throw new ArgumentException("ProdutoId invalido.");
+        // Regras de validação (Guard Clauses)
+        if (produtoId == Guid.Empty) throw new ArgumentException("ProdutoId invalido.");
+        if (string.IsNullOrWhiteSpace(codigoBarras)) throw new ArgumentException("Codigo de barras é obrigatório.");
+        if (precoVenda <= 0) throw new ArgumentException("Preco de venda deve ser maior que zero.");
+        if (estoqueAtual < 0) throw new ArgumentException("Estoque nao pode ser negativo.");
 
-        if (string.IsNullOrWhiteSpace(codigoBarras))
-            throw new ArgumentException("Codigo de barras é obrigatório.");
-
-        if (precoVenda <= 0)
-            throw new ArgumentException("Preco de venda deve ser maior que zero.");
-
-        if (estoqueAtual < 0)
-            throw new ArgumentException("Estoque nao pode ser negativo.");
-
+        Id = Guid.NewGuid();
         ProdutoId = produtoId;
         CodigoBarras = codigoBarras.Trim();
         PrecoVenda = precoVenda;
@@ -44,10 +39,27 @@ public class ProdutoVariacao
         Descricao = descricao?.Trim() ?? string.Empty;
     }
 
-    // Compatibilidade binária: overload esperado por assemblies antigas
     public ProdutoVariacao(Guid produtoId, string codigoBarras, decimal precoVenda, decimal estoqueAtual)
         : this(produtoId, codigoBarras, precoVenda, estoqueAtual, "")
     {
+    }
+
+    public ProdutoVariacao(
+         Guid id,
+         Guid produtoId,
+         string codigoBarras,
+         decimal precoVenda,
+         decimal estoqueAtual,
+         string descricao)
+    {
+        Id = id;
+        ProdutoId = produtoId;
+        CodigoBarras = codigoBarras.Trim();
+        PrecoVenda = precoVenda;
+        EstoqueAtual = estoqueAtual;
+        Descricao = descricao?.Trim() ?? string.Empty;
+
+        if (produtoId == Guid.Empty) throw new ArgumentException("ProdutoId invalido.");
     }
 
     public void AlterarPreco(decimal novoPreco)

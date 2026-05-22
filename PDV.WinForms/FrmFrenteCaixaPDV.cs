@@ -1,6 +1,4 @@
 ﻿using PDV.Application.Interfaces;
-using PDV.Infrastructure.Database;
-using PDV.Infrastructure.Repositories.Produtos;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,27 +6,24 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 
 
 namespace PDV.WinForms
 {
     public partial class FrmFrenteCaixaPDV : Form
     {
-        private readonly ProdutoVariacaoRepository _produtoVariacaoRepository;
+        private readonly IProdutoVariacaoRepository _produtoVariacaoRepository;
         private decimal _totalVenda = 0m;
         private decimal _quantidadePendente = 1m;
 
-        public FrmFrenteCaixaPDV()
+        public FrmFrenteCaixaPDV(IProdutoVariacaoRepository produtoVariacaoRepository)
         {
             InitializeComponent();
 
-            txtCodigoBarras.TextChanged += txtCodigoBarras_TextChanged;
-            string diretorioBase = AppDomain.CurrentDomain.BaseDirectory;
-            string caminhoBanco = System.IO.Path.Combine(diretorioBase, "pdv.db");
-            string stringConexao = $"Data Source={caminhoBanco}";
+            _produtoVariacaoRepository = produtoVariacaoRepository;
 
-            var connectionFactory = new SqliteConnectionFactory(stringConexao);
-            _produtoVariacaoRepository = new ProdutoVariacaoRepository(connectionFactory);
+            txtCodigoBarras.TextChanged += txtCodigoBarras_TextChanged;
         }
 
         private void FrmFrenteCaixaPDV_Load(object sender, EventArgs e)
@@ -97,8 +92,8 @@ namespace PDV.WinForms
                 variacao.CodigoBarras,
                 nomeProduto,
                 quantidade.ToString("N3"),
-                variacao.PrecoVenda.ToString("C"),
-                totalItem.ToString("C"));
+                variacao.PrecoVenda.ToString("N2"),
+                totalItem.ToString("N2"));
 
             _quantidadePendente = 1m;
             txtQuantidade.Text = "1";
@@ -106,7 +101,6 @@ namespace PDV.WinForms
             txtCodigoBarras.Clear();
             txtCodigoBarras.Focus();
         }
-
 
         private void btnAdicionar_Click(object sender, EventArgs e)
         {
@@ -141,19 +135,36 @@ namespace PDV.WinForms
 
                 e.SuppressKeyPress = true;
 
-                if (long.TryParse(texto, out _))
+                if (texto.All(char.IsDigit))
                 {
                     ConsultarCodigoBarras(_quantidadePendente);
-
-                    //_quantidadePendente = 1m;
-                    //txtQuantidade.Text = "1";
                 }
                 else
                 {
-                    // Se tiver letras, abre a tela de pesquisar produto pelo nome
-                    // AbrirModalConsulta(texto); 
+                    AbrirModalConsulta(texto);
                 }
             }
+        }
+
+        private void AbrirModalConsulta(string texto)
+        {
+            // 1. Cria o formulário de busca usando o "using" para liberar a memória depois
+            using (var formBusca = new FrmBuscaProdutos(_produtoVariacaoRepository, texto))
+            {
+                if (formBusca.ShowDialog() == DialogResult.OK)
+                {
+                    var produtoSelecionado = formBusca.CodigoProdutoSelecionado;
+
+                    if (!string.IsNullOrWhiteSpace(produtoSelecionado))
+                    {
+                        txtCodigoBarras.Text = produtoSelecionado;
+                        ConsultarCodigoBarras(_quantidadePendente);
+                    }
+                }
+            }
+
+            txtCodigoBarras.Clear();
+            txtCodigoBarras.Focus();
         }
 
         private void lblTotalItem_Click(object sender, EventArgs e)
